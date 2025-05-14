@@ -17,7 +17,7 @@ from PIL import Image
 device = torch.device("cpu")
 imsize = 512
 
-content_img_path = "Content2.jpg"
+content_img_path = "content3.jpeg"
 style_img_path = "Style2.jpg"
 output_img_path = "Output.jpeg"
 
@@ -42,7 +42,7 @@ content_losses = [ContentLoss(f.detach()) for f in content_features]
 
 style_losses=[]
 for index,f in enumerate(style_features):
-    layer_weight=(index+1)
+    layer_weight=(index+1)*2
     print(f'layer weight {layer_weight}')
     layer_style_loss=StyleLoss(f.detach(),layer_weight)
     style_losses.append(layer_style_loss)
@@ -51,7 +51,7 @@ for index,f in enumerate(style_features):
 # --- Optimization ---
 output_img = run_optimization(
     vgg, input_img, content_losses, style_losses,
-    num_steps=250, style_weight=1e10, content_weight=1e2
+    num_steps=2000, style_weight=3e9, content_weight=2e1
 )
 
 img = output_img[0].cpu().detach().numpy()
