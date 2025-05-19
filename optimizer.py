@@ -5,9 +5,13 @@ def run_optimization(model, input_img, content_losses, style_losses, num_steps=3
     optimizer = torch.optim.LBFGS([input_img.requires_grad_()])
 
     run = [0]
+    best_loss = float('inf')
+    best_img = input_img.clone().detach()
+
     while run[0] <= num_steps:
 
         def closure():
+            nonlocal best_loss, best_img
             input_img.data.clamp_(0, 1)
             optimizer.zero_grad()
 
@@ -25,14 +29,17 @@ def run_optimization(model, input_img, content_losses, style_losses, num_steps=3
             loss = style_weight * style_score + content_weight * content_score
             loss.backward()
 
+            if loss.item() < best_loss:
+                best_loss = loss.item()
+                best_img = input_img.clone().detach()
+
             run[0] += 1
             if run[0] % 50 == 0:
-                
                 print(f"Step {run[0]}: Style Loss: {style_weight * style_score:.4f}, Content Loss: {content_weight * content_score.item():.4f}")
 
             return loss
 
         optimizer.step(closure)
 
-    input_img.data.clamp_(0, 1)
-    return input_img
+    best_img.data.clamp_(0, 1)
+    return best_img

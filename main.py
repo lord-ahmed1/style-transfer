@@ -4,12 +4,20 @@ from CNN_Model import VGG
 from content_loss import ContentLoss
 from style_loss import StyleLoss
 from optimizer import run_optimization
+import matplotlib.pyplot as plt
+
+
+import torch
+import torchvision.transforms as transforms
+from PIL import Image
+
+
 
 # --- Settings ---
 device = torch.device("cuda")
 imsize = 512
 
-content_img_path = "Content2.jpg"
+content_img_path = "content2.jpg"
 style_img_path = "Style2.jpg"
 output_img_path = "Output.jpeg"
 
@@ -31,13 +39,26 @@ _, style_features = vgg(style_img)
 
 # --- Loss modules ---
 content_losses = [ContentLoss(f.detach()) for f in content_features]
-style_losses = [StyleLoss(f.detach()) for f in style_features]
 
+style_losses=[]
+for index,f in enumerate(style_features):
+    layer_weight=(index+1)**5
+    print(f'layer weight {layer_weight}')
+    layer_style_loss=StyleLoss(f.detach(),layer_weight)
+    style_losses.append(layer_style_loss)
+
+# style_losses = [StyleLoss(f.detach()) for f in style_features]
 # --- Optimization ---
 output_img = run_optimization(
     vgg, input_img, content_losses, style_losses,
-    num_steps=1000, style_weight=1e8, content_weight=1
+    num_steps=1000, style_weight=3e8, content_weight=10e1
 )
+
+img = output_img[0].cpu().detach().numpy()
+img = img.transpose(1, 2, 0)
+
+plt.imshow(img)
+
 
 # --- Save Result ---
 save_image(output_img, output_img_path)
