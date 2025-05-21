@@ -37,11 +37,10 @@ content_losses = [ContentLoss(f.detach()) for f in content_features]
 style_losses=[]
 for index,f in enumerate(style_features):
     layer_weight=(index+1)**5
-    print(f'layer weight {layer_weight}')
     layer_style_loss=StyleLoss(f.detach(),layer_weight)
     style_losses.append(layer_style_loss)
 
-style_intensity = 1
+style_intensity = 0.5
 
 
 if style_intensity != 0:
@@ -50,7 +49,7 @@ if style_intensity != 0:
     # --- Optimization ---
     output_img = run_optimization(
         vgg, input_img, content_losses, style_losses,
-        num_steps=100, style_weight=3e8, content_weight= 50e3 * x
+        num_steps=100, style_weight=1e6, content_weight=x*10**2.5
     )
 
 else:
@@ -70,9 +69,9 @@ import torchvision.transforms as transforms
 save_image(output_img, output_img_path)
 print("Output image saved to", output_img_path)
 def imshow(tensor, title=None):
-    unloader = transforms.ToPILImage()  # reconvert into PIL image
-    image = tensor.cpu().clone()        # clone the tensor to not alter the original
-    image = image.squeeze(0)            # remove the batch dimension
+    unloader = transforms.ToPILImage()
+    image = tensor.cpu().clone()
+    image = image.squeeze(0)
     image = unloader(image)
     plt.imshow(image)
     if title is not None:

@@ -2,7 +2,7 @@ import torch.optim as optim
 import torch
 
 def run_optimization(model, input_img, content_losses, style_losses, num_steps=300, style_weight=1e6, content_weight=1):
-    optimizer = torch.optim.LBFGS([input_img.requires_grad_()])
+    optimizer = torch.optim.LBFGS([input_img.requires_grad_()], lr = 1)
     run = [0]
     best_loss = float('inf')
     best_img = input_img.clone().detach()
@@ -33,12 +33,11 @@ def run_optimization(model, input_img, content_losses, style_losses, num_steps=3
                 best_img = input_img.clone().detach()
 
             run[0] += 1
-            if run[0] % 1 == 0:
-                print(f"Step {run[0]}: Style Loss: {style_score * 100000:.4f}, Content Loss: {content_score.item():.4f}")
-                # print(f"Step {run[0]}: Style Loss: {style_weight * style_score:.4f}, Content Loss: {content_weight * content_score.item():.4f}")
+            # if run[0] % 25 == 0:
+                # print(f"Step {run[0]}: Style Loss: {style_score * 100000:.4f}, Content Loss: {content_score.item():.4f}")
 
             return loss
-
+        
         optimizer.step(closure)
 
     best_img.data.clamp_(0, 1)
