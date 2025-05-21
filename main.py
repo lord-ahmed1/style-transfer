@@ -11,6 +11,7 @@ def api():
         content_image = request.files.get("contentImage")
         style_intensity = request.form.get("styleIntensity")
         use_transformer = request.form.get("useTransformer") != None
+        print('thresh',float(style_intensity)/100)
         if use_transformer:
             model="vit"
         else:
@@ -24,7 +25,7 @@ def api():
         if content_image:
             content_image.save("static/uploaded/content/content_uploaded.jpg")
         if style_image and content_image:
-            style_transfer(style_path="static/uploaded/style/style_uploaded.jpg", content_path="static/uploaded/content/content_uploaded.jpg",output_path="static/uploaded/output/output.jpg", style_threshold=float(style_intensity)/100,num_steps=2,model_type=model)
+            style_transfer(style_path="static/uploaded/style/style_uploaded.jpg", content_path="static/uploaded/content/content_uploaded.jpg",output_path="static/uploaded/output/output.jpg", style_threshold=float(style_intensity)/100,num_steps=1000,model_type=model)
         return redirect(url_for('result'))
 
 @app.route('/result')

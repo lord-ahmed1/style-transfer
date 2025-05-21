@@ -68,8 +68,8 @@ def run_optimization(model, input_img, content_losses, style_losses,
             loss.backward()
             
             # Store loss history
-            loss_history['content'].append(weighted_content_loss.item())
-            loss_history['style'].append(weighted_style_loss.item())
+            loss_history['content'].append(weighted_content_loss)
+            loss_history['style'].append(weighted_style_loss)
             loss_history['tv'].append(weighted_tv_loss if isinstance(weighted_tv_loss, (int, float)) else weighted_tv_loss.item())
             loss_history['total'].append(loss.item())
 
@@ -81,7 +81,7 @@ def run_optimization(model, input_img, content_losses, style_losses,
             run[0] += 1
             if run[0] % 50 == 0:
                 print(f"Step {run[0]}: Style Loss: {weighted_style_loss:.4f}, "
-                      f"Content Loss: {weighted_content_loss.item():.4f}, "
+                      f"Content Loss: {weighted_content_loss:.4f}, "
                       f"TV Loss: {weighted_tv_loss if isinstance(weighted_tv_loss, (int, float)) else weighted_tv_loss.item():.4f}")
 
             return loss
