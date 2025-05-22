@@ -13,7 +13,7 @@ def api():
         style_intensity = request.form.get("styleIntensity")
         style_intensity=float(style_intensity)/100
         use_transformer = request.form.get("useTransformer") != None
-        print('thresh',float(style_intensity)/100)
+        print('thresh',float(style_intensity))
         if use_transformer:
             model="vit"
         else:
