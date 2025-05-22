@@ -1,5 +1,6 @@
 from flask import Flask, render_template , request , redirect , url_for
 from style_transfer.style_transfer import style_transfer
+from vgg.style_transfer import style_transfer as vgg_style_transfer
 
 app=Flask(__name__)
 @app.route('/', methods=['GET','POST'])
@@ -10,13 +11,14 @@ def api():
         style_image = request.files.get("styleImage")
         content_image = request.files.get("contentImage")
         style_intensity = request.form.get("styleIntensity")
+        style_intensity=float(style_intensity)/100
         use_transformer = request.form.get("useTransformer") != None
         print('thresh',float(style_intensity)/100)
         if use_transformer:
             model="vit"
         else:
             model="vgg"
-
+        
         print(model)
 
         # Save or process files
@@ -25,7 +27,12 @@ def api():
         if content_image:
             content_image.save("static/uploaded/content/content_uploaded.jpg")
         if style_image and content_image:
-            style_transfer(style_path="static/uploaded/style/style_uploaded.jpg", content_path="static/uploaded/content/content_uploaded.jpg",output_path="static/uploaded/output/output.jpg", style_threshold=float(style_intensity)/100,num_steps=1000,model_type=model)
+            if model=="vit":
+                style_transfer(style_path="static/uploaded/style/style_uploaded.jpg", content_path="static/uploaded/content/content_uploaded.jpg",output_path="static/uploaded/output/output.jpg", style_threshold=style_intensity,num_steps=1000,model_type="vit")
+            else:
+                vgg_style_transfer(content_img_path="static/uploaded/content/content_uploaded.jpg",style_img_path="static/uploaded/style/style_uploaded.jpg",output_img_path="static/uploaded/output/output.jpg",style_threshold=style_intensity,n_steps=110)
+
+
         return redirect(url_for('result'))
 
 @app.route('/result')
